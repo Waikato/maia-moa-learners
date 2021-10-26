@@ -25,13 +25,13 @@ import moa.core.Example
 import moa.learners.Learner
 import māia.ml.dataset.DataRow
 import māia.ml.dataset.DataStream
-import māia.ml.dataset.WithColumnHeaders
+import māia.ml.dataset.headers.DataColumnHeaders
+import māia.ml.dataset.headers.ensureOwnership
+import māia.ml.dataset.headers.viewColumns
 import māia.ml.dataset.moa.dataRowToInstanceExample
+import māia.ml.dataset.moa.representationParseMOAValue
 import māia.ml.dataset.moa.withColumnHeadersToInstancesHeader
-import māia.ml.dataset.type.Nominal
-import māia.ml.dataset.util.buildRow
-import māia.ml.dataset.util.ifIsPossiblyMissing
-import māia.ml.dataset.view.readOnlyViewColumns
+import māia.ml.dataset.type.DataRepresentation
 import māia.ml.learner.AbstractLearner
 import māia.ml.learner.type.Classifier
 import māia.ml.learner.type.LearnerType
@@ -58,10 +58,10 @@ class MOALearner(
     lateinit var instancesHeader : InstancesHeader
 
     override fun performInitialisation(
-        headers : WithColumnHeaders
-    ) : Triple<WithColumnHeaders, WithColumnHeaders, LearnerType> {
-        val predictInputHeaders = headers.readOnlyViewColumns { _, header -> !header.isTarget}
-        val predictOutputHeaders = headers.readOnlyViewColumns { _, header -> header.isTarget}
+        headers : DataColumnHeaders
+    ) : Triple<DataColumnHeaders, DataColumnHeaders, LearnerType> {
+        val predictInputHeaders = headers.viewColumns { _, header -> !header.isTarget}
+        val predictOutputHeaders = headers.viewColumns { _, header -> header.isTarget}
 
         instancesHeader = withColumnHeadersToInstancesHeader(headers)
 
@@ -90,14 +90,14 @@ class MOALearner(
 
         val votes = source.getVotesForInstance(instance)
 
-        val prediction = votes.iterator().maxWithIndex().first
+        val prediction = votes.iterator().maxWithIndex().first.toDouble()
 
-        return predictOutputHeaders.buildRow { _, header ->
-            val type = header.type
-            ifIsPossiblyMissing<Nominal<*>>(type) then {
-                it.convertIndexToInternal(prediction)
-            } otherwise {
-                throw Exception("Can only predict nominal values")
+        return object : DataRow {
+            override val headers : DataColumnHeaders = this@MOALearner.predictOutputHeaders
+            override fun <T> getValue(
+                representation : DataRepresentation<*, *, out T>
+            ) : T  = this@MOALearner.predictOutputHeaders.ensureOwnership(representation) {
+                representationParseMOAValue(this, prediction)
             }
         }
     }

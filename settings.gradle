@@ -1,2 +1,5 @@
+rootProject.name = "maia-moa-learners"
+includeBuild "../maia-build"
+includeBuild "../maia-build-moa"
 includeBuild "../maia-moa-datasets"
 includeBuild "../maia-learner"
