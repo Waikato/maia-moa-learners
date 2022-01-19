@@ -17,27 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with MĀIA.  If not, see <https://www.gnu.org/licenses/>.
  */
-package māia.ml.learner.moa
+package maia.ml.learner.moa
 
 import com.yahoo.labs.samoa.instances.*
 import moa.classifiers.MultiClassClassifier
 import moa.core.Example
 import moa.learners.Learner
-import māia.ml.dataset.DataRow
-import māia.ml.dataset.DataStream
-import māia.ml.dataset.headers.DataColumnHeaders
-import māia.ml.dataset.headers.ensureOwnership
-import māia.ml.dataset.headers.viewColumns
-import māia.ml.dataset.moa.dataRowToInstanceExample
-import māia.ml.dataset.moa.representationParseMOAValue
-import māia.ml.dataset.moa.withColumnHeadersToInstancesHeader
-import māia.ml.dataset.type.DataRepresentation
-import māia.ml.learner.AbstractLearner
-import māia.ml.learner.type.Classifier
-import māia.ml.learner.type.LearnerType
-import māia.ml.learner.type.SingleTarget
-import māia.ml.learner.type.intersectionOf
-import māia.util.maxWithIndex
+import maia.ml.dataset.DataRow
+import maia.ml.dataset.DataStream
+import maia.ml.dataset.headers.DataColumnHeaders
+import maia.ml.dataset.headers.ensureOwnership
+import maia.ml.dataset.headers.viewColumns
+import maia.ml.dataset.moa.dataRowToInstanceExample
+import maia.ml.dataset.moa.representationParseMOAValue
+import maia.ml.dataset.moa.withColumnHeadersToInstancesHeader
+import maia.ml.dataset.type.DataRepresentation
+import maia.ml.learner.AbstractLearner
+import maia.ml.learner.type.Classifier
+import maia.ml.learner.type.LearnerType
+import maia.ml.learner.type.SingleTarget
+import maia.ml.learner.type.intersectionOf
+import maia.util.maxWithIndex
 
 val MOA_LEARNER_TYPE = intersectionOf(SingleTarget, Classifier)
 
