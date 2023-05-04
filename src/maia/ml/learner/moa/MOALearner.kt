@@ -20,6 +20,8 @@
 package maia.ml.learner.moa
 
 import com.yahoo.labs.samoa.instances.*
+import kotlinx.coroutines.flow.collect
+import maia.ml.dataset.AsyncDataStream
 import moa.classifiers.MultiClassClassifier
 import moa.core.Example
 import moa.learners.Learner
@@ -46,9 +48,9 @@ val MOA_LEARNER_TYPE = intersectionOf(SingleTarget, Classifier)
  */
 class MOALearner(
     val source : Learner<Example<Instance>>
-) : AbstractLearner<DataStream<*>>(
+) : AbstractLearner<AsyncDataStream<*>>(
     MOA_LEARNER_TYPE,
-    DataStream::class
+    AsyncDataStream::class
 ) {
     init {
         if (source !is MultiClassClassifier)
@@ -74,13 +76,14 @@ class MOALearner(
         )
     }
 
-    override fun performTrain(
-        trainingDataset : DataStream<*>
+    override suspend fun performTrain(
+        trainingDataset : AsyncDataStream<*>
     ) {
-        for (row in trainingDataset.rowIterator())
+        trainingDataset.rowFlow().collect { row ->
             source.trainOnInstance(
                 dataRowToInstanceExample(row, instancesHeader)
             )
+        }
     }
 
     override fun performPredict(
